@@ -4,10 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## TODO Work on combat system
+
 ## Version 1.5.0
   Date May 23, 2018
-- Added player class Barb.java
-- Updated code in Party.java to make it functional.
+- Added multiple character classes
+- Updated code in Party.java to make access of character classes functional.
+- Updated code in Dungeon.java to access new character classes
 
 ## Version 1.4.0
   Date May 20, 2018
