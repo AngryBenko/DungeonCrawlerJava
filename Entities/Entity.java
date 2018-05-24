@@ -3,21 +3,28 @@ package Entities;
 import java.util.ArrayList;
 import javax.swing.*;
 
+// TODO display health underneath entity, remove that function from dungeon
 public class Entity {
     protected String name;
+    protected boolean isTurn;
     protected int maxHealth;
     protected int health;
-    protected int attackDamage;
+    protected int lightAttack;
+    protected int heavyAttack;
     protected int defense;
     protected int speed;
-    protected JLabel label;
+    protected JLabel label; // add border based on turn order
+    protected JLabel deadLabel; // display skull if dead
     protected JTextArea healthText;
 
-    public Entity(String name, int health, int atk, int def, JLabel label) {
+    public Entity(String name, int health, int lAtk, int hAtk, int spd, int def, JLabel label) {
+        this.isTurn = false;
         this.name = name;
         this.health = health;
         this.maxHealth = health;
-        this.attackDamage = atk;
+        this.lightAttack = lAtk;
+        this.heavyAttack = hAtk;
+        this.speed = spd;
         this.defense = def;
         this.label = label;
     }
@@ -42,13 +49,11 @@ public class Entity {
         this.health = health;
     }
 
-    public int getAttackDamage() {
-        return attackDamage;
-    }
+    public int getLightAttack() { return this.lightAttack; }
 
-    public void setAttackDamage(int attackDamage) {
-        this.attackDamage = attackDamage;
-    }
+    public int getHeavyAttack() { return this.heavyAttack; }
+
+    public int getSpeed() { return this.speed; }
 
     public int getDefense() {
         return defense;
@@ -73,4 +78,10 @@ public class Entity {
     public String healthString() {
         return (health + "/" + maxHealth);
     }
+
+    public boolean isDead() {
+        return (health == 0);
+    }
+
+    public void setTurn(boolean value) { isTurn = value; }
 }
