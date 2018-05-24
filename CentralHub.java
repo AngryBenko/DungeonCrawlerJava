@@ -9,7 +9,8 @@ public class CentralHub {
     private final JButton menuButtons[] = new JButton[menuNames.length];
 
     private final Font titleFont = new Font("Copperplate Gothic Bold", Font.PLAIN, 50);
-    private final Font menuFont = new Font("Copperplate Gothic Bold", Font.PLAIN, 24);
+    private final Font menuFontHover = new Font("Copperplate Gothic Bold", Font.PLAIN, 24);
+    private final Font menuFont = new Font("Copperplate Gothic Bold", Font.PLAIN, 14);
 
     public CentralHub(GameController.CentralHubHandler chHandler) {
         init(chHandler);
@@ -32,11 +33,13 @@ public class CentralHub {
         hubNameLabel.setForeground(Color.white);
         hubNameLabel.setFont(titleFont);
 
+
         // Any menu buttons that exist will be under one panel for organization and rendering purposes
         // also reduces the ned for additional panels per button
         hubButtonPanel = new JPanel();
         hubButtonPanel.setBounds(300, 300, 200, 150);
         hubButtonPanel.setBackground(Color.black);
+        hubButtonPanel.setOpaque(false);
         hubButtonPanel.setLayout(new GridLayout(3, 1, 0, 0)); // GridLayout(row, col, colgap, rowgap);
 
         // Creating menu buttons which will be added to a panel later
@@ -46,11 +49,23 @@ public class CentralHub {
             JButton btn = new JButton(menuNames[i]);
             btn.setActionCommand("hub" + i);
             btn.addActionListener(chHandler);
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    btn.setFont(menuFontHover);
+                }
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    btn.setFont(menuFont);
+                }
+            });
             //btn.setBorder(null);
-            btn.setBackground(Color.black);
+            btn.setBackground(Color.lightGray);
             btn.setForeground(Color.white);
             btn.setFont(menuFont);
             btn.setFocusPainted(false);
+            btn.setOpaque(false);
+            btn.setBorderPainted(false);
             menuButtons[i] = btn;
             hubButtonPanel.add(menuButtons[i]);
         }

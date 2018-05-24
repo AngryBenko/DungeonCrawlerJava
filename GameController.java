@@ -1,4 +1,3 @@
-// TODO create a player class
 // TODO work on an inventory system, possibly interacts with a player class?
 
 import Entities.*;
@@ -9,7 +8,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-// TODO adjust all x, y, width, and height values accoring to DISPLAY_WIDTH and DISPLAY_HEIGHT
 public class GameController extends JFrame {
     private final int DISPLAY_WIDTH;
     private final int DISPLAY_HEIGHT;
@@ -73,6 +71,8 @@ public class GameController extends JFrame {
     }
 
     private void initParty() {
+        add(p.getEnter());
+        add(p.getBackPanel());
         add(p.getPartyNamePanel());
         add(p.getPartyChosenPanel());
         add(p.getPartyIconPanel());
@@ -102,6 +102,8 @@ public class GameController extends JFrame {
         if(value)
             initDungeon();
         dungeon.setVisible(value);
+        // call combat
+        // updateDungeon(true, 4);
         render();
     }
 
@@ -126,6 +128,9 @@ public class GameController extends JFrame {
                 dungeon.setWait(true);
                 dungeon.displayExit();
             case 4:
+                // while(!isCleared()
+                //  combat();
+                //  render();
                 break;
             default: break;
         }
@@ -235,21 +240,29 @@ public class GameController extends JFrame {
                     System.out.println("4th char selected");
                     p.setParty(3,pHandler);
                     break;
-                case "num5" :
+                case "num4":
                     System.out.println("5th char selected");
+                    p.setParty(4, pHandler);
+                    break;
+                case "num5" :
+                    System.out.println("6th char selected");
                     p.setParty(5,pHandler);
                     break;
                 case "num6" :
-                    System.out.println("6th char selected");
+                    System.out.println("7th char selected");
                     p.setParty(6,pHandler);
                     break;
-                case "Exit" :
+                case "num7":
+                    System.out.println("8th char selected");
+                    p.setParty(7,pHandler);
+                    break;
+                case "back" :
                     System.out.println("Enter Hub");
                     p.clearParty(pHandler);
                     displayP(false);
                     displayCH(true);
                     break;
-                case "Enter\nDungeon" :
+                case "enter" :
                     System.out.println("Enter Dungeon");
                     dungeon.setParty(p.passParty());
                     dungeon.setDungeonSize(0);

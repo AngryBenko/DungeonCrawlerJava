@@ -7,10 +7,13 @@ import javax.swing.border.LineBorder;
 
 
 public class Party {
-    private JPanel partyNamePanel, partyIconPanel, partyChosenPanel;
+    private JPanel partyNamePanel, partyIconPanel, partyChosenPanel, backPanel;
     private JLabel partyNameLabel;
+    private JButton backButton;
+    private final int partySize = 4;
 
-    public String selectedParty[] = new String[4];
+    private JLabel partyPosLabel[] = new JLabel[partySize];
+    public String selectedParty[] = new String[partySize];
     private int counter = 0;
 
     public String charIcons[] = {"barbarian1.png", "barbarian2.png", "beard.png", "knight_gold.png", "knight1.png", "mage_fire.png", "maniac1.png", "oldman.png"};
@@ -24,23 +27,59 @@ public class Party {
 
     private final Font titleFont = new Font("Copperplate Gothic Bold", Font.PLAIN, 50);
     private final Font menuFont = new Font("Copperplate Gothic Bold", Font.PLAIN, 24);
+    private final Font buttonFont = new Font("Copperplate Gothic Bold", Font.PLAIN, 12);
 
+    private Entity charParty[] = new Entity[partySize];
 
-    // Testing player class
-    private Entity charParty[] = new Entity[4];
+    private JPanel enter;
+    private JButton enterB;
 
     public Party(GameController.PartyHandler pHandler) {
         init(pHandler);
     }
 
     private void init(GameController.PartyHandler pHandler) {
+        // Testing enter dungeon
+        enter = new JPanel();
+        enter.setBounds(650, 525, 120, 50);
+        enter.setBackground(Color.blue);
+        enterB = new JButton("<html>Select<br/>Dungeon</html>");
+        enterB.setActionCommand("enter");
+        enterB.addActionListener(pHandler);
+        enterB.setBackground(Color.black);
+        enterB.setForeground(Color.white);
+        enterB.setFont(buttonFont);
+        enterB.setFocusPainted(false);
+        enter.add(enterB);
+
+        backPanel = new JPanel();
+        backPanel.setBounds(50, 525, 80, 35);
+        backPanel.setBackground(Color.blue);
+        backButton = new JButton("Back");
+        backButton.setActionCommand("back");
+        backButton.addActionListener(pHandler);
+        backButton.setBackground(Color.black);
+        backButton.setForeground(Color.white);
+        backButton.setFont(buttonFont);
+        backButton.setFocusPainted(false);
+        backPanel.add(backButton);
+
         //Party Title Icon
-        partyNamePanel = new JPanel();
+        partyNamePanel = new JPanel(null);
         partyNamePanel.setBounds(0, 0, 800, 100); // setBounds(x,y,width,height);
         partyNamePanel.setBackground(Color.black);
         partyNameLabel = new JLabel("Make Your Party");
         partyNameLabel.setForeground(Color.white);
         partyNameLabel.setFont(titleFont);
+        partyNameLabel.setBounds(150, 0, 700, 70);
+        for(int i = 0; i < partySize; i++) {
+            partyPosLabel[i] = new JLabel("pos" + (4 - i));
+            partyPosLabel[i].setForeground(Color.white);
+            partyPosLabel[i].setFont(buttonFont);
+            partyPosLabel[i].setBounds(220 + (i * 110), 70, 400, 30);
+            partyNamePanel.add(partyPosLabel[i]);
+        }
+
 
         //Chosen Character Icons
         partyChosenPanel = new JPanel();
@@ -71,22 +110,16 @@ public class Party {
 
         partyIconPanel = new JPanel();
         partyIconPanel.setBounds(100, 200, 600, 300);
-        partyIconPanel.setBackground(Color.black);
+        partyIconPanel.setBackground(Color.blue);
         partyIconPanel.setLayout(new GridLayout(2, 4, 0, 0)); // GridLayout(row, col, colgap, rowgap);
         // Creating menu buttons which will be added to a panel later
         // Many buttons contained by one panel share common properties
         // Also reduces the amount of code needed to make multiple buttons
         for (int i = 0; i < partyIconButtons.length; i++) {
-            JButton btn = new JButton(partyIconNames[i]);
+            JButton btn = new JButton();
             ImageIcon icon2 = new ImageIcon(getClass().getClassLoader().getResource("res/entity/characters/" + charIcons[i]));
-            if(i != 7 && i != 4)
-                btn.setIcon(icon2);
-
+            btn.setIcon(icon2);
             btn.setActionCommand("num" + i);
-            if(i == 7)
-                btn.setActionCommand("Enter\nDungeon");
-            else if(i == 4)
-                btn.setActionCommand("Exit");
             btn.addActionListener(pHandler);
             btn.setBackground(Color.black);
             btn.setForeground(Color.white);
@@ -108,11 +141,15 @@ public class Party {
         // Always revalidate and repaint JFrame when adding new components/panels
         // Similar to a update and render
     }
+    public JPanel getEnter() { return enter; }
+    public JPanel getBackPanel() { return backPanel; }
     public JPanel getPartyNamePanel() { return partyNamePanel; }
     public JPanel getPartyChosenPanel() { return partyChosenPanel; }
     public JPanel getPartyIconPanel() { return partyIconPanel; }
 
     public void setVisible(boolean value) {
+        enter.setVisible(value);
+        backPanel.setVisible(value);
         partyNamePanel.setVisible(value);
         partyChosenPanel.setVisible(value);
         partyIconPanel.setVisible(value);
@@ -188,7 +225,7 @@ public class Party {
             JButton btn;
             // selectedParty[i] is the chosen character
             if(selectedParty[i] != null) {
-                btn = new JButton(selectedParty[i]);
+                btn = new JButton();
                 icon = new ImageIcon(getClass().getClassLoader().getResource(selectedParty[i]));
                 btn.setIcon(icon);
             }

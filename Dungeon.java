@@ -61,6 +61,8 @@ public class Dungeon {
     private Entity boss;
     private Entity partyArray[] = new Entity[partySize];
 
+    private ArrayList<Entity> turnOrder = new ArrayList<Entity>();
+
     public Dungeon(GameController.ActionButtonHandler abHandler) {
         init(abHandler);
     }
@@ -76,8 +78,8 @@ public class Dungeon {
     // Initialization of dungeon variables, JPanels, JLabels, and JButtons
     // ============================================
     public void setParty(Entity[] party) {
-        for(int i = 0; i < 4; i++) {
-            partyArray[i] = party[i];
+        for(int i = 0; i < partySize; i++) {
+            partyArray[3 - i] = party[i]; // we flip the array order
             System.out.println("index: " + i);
         }
     }
@@ -268,8 +270,10 @@ public class Dungeon {
     private void generateChar() {
         System.out.println("Generating character");
         for(int i = 0; i < partySize; i++) {
-            partyArray[i].setBounds((280 - (i * 80)), 140, 80, 80);
-            charPanel.add(partyArray[i].getLabel());
+            if(partyArray[i] != null) {
+                partyArray[i].setBounds((280 - (i * 80)), 140, 80, 80);
+                charPanel.add(partyArray[i].getLabel());
+            }
         }
     }
     // generateEnemy() now creates a new monster object
@@ -296,7 +300,6 @@ public class Dungeon {
             boss.setBounds(100, 0, 200, 200);
             enemyPanel.add(boss.getLabel());
         } else {
-            // TODO initialize monsterList and then randomly select monsters;
             // TODO seperate monsterList based on Dungeon Diffuclty;
             // TODO find a more efficient way to generate monsters??
             for(int i = 0; i < roomList.get(currentRoom).getMaxEnemies(); i++) {
@@ -426,7 +429,9 @@ public class Dungeon {
     }
     private void resetChar() { // This has no use when using the current version of generateChar()
         for(int i = 0; i < partySize; i ++) {
-            charPanel.remove(partyArray[i].getLabel());
+            if(partyArray[i] != null) {
+                charPanel.remove(partyArray[i].getLabel());
+            }
         }
     }
     private void resetRoom() {
@@ -463,6 +468,7 @@ public class Dungeon {
     // Combat functions (in testing)
     // ==================================================
     // To test if we can get monster object health and change it
+    public void combat() {}
     public void setCombatText() {
         if(isFinalRoom()) {
             combatLog.append("Entity 1: Health: " + boss.healthString() + "\n");
