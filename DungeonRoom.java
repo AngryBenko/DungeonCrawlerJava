@@ -6,15 +6,16 @@ public class DungeonRoom {
     private Random rand = new Random();
     private boolean roomCleared;
     private boolean activeRoom;
+    private boolean finalRoom;
     private final int roomNumber;
-    private final int maxEnemies;
+    private int maxEnemies;
 
-    public DungeonRoom(int roomNumber, boolean roomCleared, boolean activeRoom) {
+    public DungeonRoom(int roomNumber, boolean roomCleared, boolean activeRoom, boolean finalRoom) {
         this.roomNumber = roomNumber;
         this.roomCleared = roomCleared;
         this.activeRoom = activeRoom;
-        maxEnemies = rand.nextInt(4) + 1;
-        //maxEnemies = 1;
+        this.finalRoom = finalRoom;
+        setMaxEnemies(this.finalRoom);
         System.out.println("Max enemies: " + maxEnemies);
     }
 
@@ -28,10 +29,12 @@ public class DungeonRoom {
     public boolean getCleared() { return roomCleared; }
     public int getRoomNumber() { return roomNumber; }
     public int getMaxEnemies() { return maxEnemies; }
-    public boolean isFinalRoom(int num) {
-        if(roomNumber == num) {
-            return true;
-        }
-        return false;
+    private void setMaxEnemies(boolean value) {
+        if(value) {
+            maxEnemies = 1;
+        } else {
+            maxEnemies = rand.nextInt(4) + 1;
+            //maxEnemies = 4;
+        }        
     }
 }

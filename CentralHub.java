@@ -5,7 +5,7 @@ public class CentralHub {
     private JPanel hubNamePanel, hubButtonPanel, background;
     private JLabel hubNameLabel, hubBackground;
 
-    private final String menuNames[] = {"DUNGEONS", "STORE", "EXIT"};
+    private final String menuNames[] = {"DUNGEONS", "STORE", "BACK"};
     private final JButton menuButtons[] = new JButton[menuNames.length];
 
     private final Font titleFont = new Font("Copperplate Gothic Bold", Font.PLAIN, 50);

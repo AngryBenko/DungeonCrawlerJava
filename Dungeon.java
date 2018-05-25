@@ -7,18 +7,15 @@ Combat class
  */
 
 import Entities.*;
+import com.sun.jmx.mbeanserver.JmxMBeanServer;
 
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.BorderFactory;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
 
 import java.awt.*;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 import java.util.ArrayList;
 
@@ -33,12 +30,14 @@ public class Dungeon {
     private final int bgModels = 6;
     private boolean cleared = false;
     private boolean wait = false;
+    private int currentMonsters = 0;
     private int currentRoom = 0;
     private int previousRoom = -1; // this value helps ensure that each room generated is not previously the same
     private int roomDisplay = 0;
-    private final int partySize = 4, monsters = 10, bosses = 3;
+    private final int partySize = 1, monsters = 10, bosses = 3;
 
-    private final String actionNames[] = {"Attack", "Heal", "Run", "Punch", "Kick", "Kamehameha"};
+    private final String actionNames2[] = {"Light Atk", "Heavy Atk", "Heal"};
+    private final String actionNames[] = {"Skip", "Swap"};
 
     private JTextArea combatLog;
     private JScrollPane combatScroll;
@@ -47,7 +46,7 @@ public class Dungeon {
             nextPanel, exitPanel, logPanel;
     private JLabel bossRoomLabel, mapBGLabel, choiceLabel, roomLabel;
 
-    private final JButton actionButtons[] = new JButton[actionNames.length];
+    private final JButton actionButtons[] = new JButton[actionNames2.length + actionNames.length];
     private final JLabel roomBG[] = new JLabel[bgModels];
 
     private final Font buttonFont = new Font("Copperplate Gothic Bold", Font.PLAIN, 12);
@@ -62,6 +61,8 @@ public class Dungeon {
     private Entity partyArray[] = new Entity[partySize];
 
     private ArrayList<Entity> turnOrder = new ArrayList<Entity>();
+
+    private JPopupMenu menu;
 
     public Dungeon(GameController.ActionButtonHandler abHandler) {
         init(abHandler);
@@ -79,8 +80,78 @@ public class Dungeon {
     // ============================================
     public void setParty(Entity[] party) {
         for(int i = 0; i < partySize; i++) {
-            partyArray[3 - i] = party[i]; // we flip the array order
+            //partyArray[3 - i] = party[i]; // we flip the array order
+            partyArray[i] = party[i];
             System.out.println("index: " + i);
+        }
+    }
+    public void generateCharAtk(GameController.ActionButtonHandler abHandler, GameController.PopupActionListener popHandler) {
+        menu = new JPopupMenu();
+        for(int j = 0; j < roomList.get(currentRoom).getMaxEnemies(); j++) {
+            JMenuItem menuItem;
+            if(!isFinalRoom()) {
+                menuItem = new JMenuItem(monsterList.get(j).getName());
+                menuItem.setActionCommand("monster" + j);
+                menuItem.addActionListener(popHandler);
+                menu.add(menuItem);
+            }
+        }
+
+        for(int i = 0; i < partyArray[0].getNAtks(); i++) {
+            JButton btn = new JButton(actionNames2[i]);
+            btn.setActionCommand(actionNames2[i]);
+            if(isFinalRoom()) {
+                btn.addActionListener(abHandler);
+            } else {
+                btn.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        menu.show(btn, btn.getWidth()/2, btn.getHeight()/2);
+                    }
+                });
+            }
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    btn.setBackground(Color.orange);
+                }
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    btn.setBackground(Color.lightGray);
+                }
+            });
+            btn.setBackground(Color.lightGray);
+            btn.setForeground(Color.white);
+            btn.setFont(buttonFont);
+            btn.setFocusPainted(false);
+            btn.setOpaque(false);
+            btn.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+            actionButtons[i] = btn;
+            choiceButtonPanel.add(actionButtons[i]);
+        }
+
+        for(int i = 0; i < actionNames.length; i++) {
+            JButton btn = new JButton(actionNames[i]);
+            btn.setActionCommand(actionNames[i]);
+            btn.addActionListener(abHandler);
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    btn.setBackground(Color.orange);
+                }
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    btn.setBackground(Color.lightGray);
+                }
+            });
+            btn.setBackground(Color.lightGray);
+            btn.setForeground(Color.white);
+            btn.setFont(buttonFont);
+            btn.setFocusPainted(false);
+            btn.setOpaque(false);
+            btn.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+            actionButtons[i] = btn;
+            choiceButtonPanel.add(actionButtons[i]);
         }
     }
     public void setDungeonSize(int n) {
@@ -97,9 +168,11 @@ public class Dungeon {
 
         for(int i = 0; i < dungeonSize; i++) {
             if(i == 0) {
-                roomList.add(new DungeonRoom(i, false, true));
+                roomList.add(new DungeonRoom(i, false, true, false));
+            } else if ((i + 1) == dungeonSize) {
+                roomList.add(new DungeonRoom(i, false, false, true));
             } else {
-                roomList.add(new DungeonRoom(i, false, false));
+                roomList.add(new DungeonRoom(i, false, false, false));
             }
         }
         generateChar();
@@ -193,6 +266,7 @@ public class Dungeon {
         exitButton.setFocusPainted(false);
         exitPanel.add(exitButton);
 
+        /*
         // Creating action buttons which will be added to a panel later
         for(int i = 0; i < actionButtons.length; i++) {
             JButton btn = new JButton(actionNames[i]);
@@ -237,7 +311,7 @@ public class Dungeon {
             }
             actionButtons[i] = btn;
             choiceButtonPanel.add(actionButtons[i]);
-        }
+        }*/
     }
     private void initCombatLog() {
         combatLog = new JTextArea("");
@@ -280,6 +354,7 @@ public class Dungeon {
     // each monster object has its own Jlabel initialized based on child object
     private void generateEnemy() {
         System.out.println("Generating enemies");
+        currentMonsters = roomList.get(currentRoom).getMaxEnemies();
         if(isFinalRoom()) {
             switch(getRandomNumber(bosses)) {
                 case 0:
@@ -295,7 +370,7 @@ public class Dungeon {
                     break;
             }
             initMonsterHP(0, boss.healthString());
-            monsterHPList.get(0).setBounds(150, 230, 50, 20);
+            monsterHPList.get(0).setBounds(150, 230, 60, 20);
             enemyPanel.add(monsterHPList.get(0));
             boss.setBounds(100, 0, 200, 200);
             enemyPanel.add(boss.getLabel());
@@ -334,8 +409,12 @@ public class Dungeon {
             }
         }
     }
-    private void updateHP() {
-        monsterHPList.get(0).setText(monsterList.get(0).healthString());
+    private void updateHP(int index) {
+        if(isFinalRoom()) {
+            monsterHPList.get(index).setText(boss.healthString());
+        } else {
+            monsterHPList.get(index).setText(monsterList.get(index).healthString());
+        }
     }
     private void generateRoom() {
         System.out.println("Generating next room");
@@ -355,6 +434,7 @@ public class Dungeon {
         if(!isComplete()) {
             roomList.get(currentRoom).setActiveRoom(false);
             resetEnemy();
+            resetAtk();
             currentRoom++;
             roomList.get(currentRoom).setActiveRoom(true);
             generateEnemy();
@@ -406,15 +486,38 @@ public class Dungeon {
         }
     }
 
+    public void updateMenuItem(GameController.PopupActionListener popHandler) {
+        menu = new JPopupMenu();
+        for(int j = 0; j < roomList.get(currentRoom).getMaxEnemies(); j++) {
+            JMenuItem menuItem;
+            if(isFinalRoom()) {
+                menuItem = new JMenuItem(boss.getName());
+                menuItem.setActionCommand("boss");
+                menuItem.addActionListener(popHandler);
+                menu.add(menuItem);
+            } else {
+                if(!monsterList.get(j).isDead()) {
+                    menuItem = new JMenuItem(monsterList.get(j).getName());
+                    menuItem.setActionCommand("monster" + j);
+                    menuItem.addActionListener(popHandler);
+                    menu.add(menuItem);
+                }
+            }
+        }
+    }
     // ================================================
     // Reset functions
     // ================================================
     public void reset() {
+        resetAtk();
         resetCombatLog();
         resetEnemy();
         resetChar();
         resetRoom();
         resetMiniMap();
+    }
+    private void resetAtk() {
+        choiceButtonPanel.removeAll();
     }
     private void resetEnemy() {
         if(!monsterList.isEmpty()) {
@@ -468,20 +571,30 @@ public class Dungeon {
     // Combat functions (in testing)
     // ==================================================
     // To test if we can get monster object health and change it
-    public void combat() {}
-    public void setCombatText() {
+    public void combat(int index, GameController.PopupActionListener popHandler) {
         if(isFinalRoom()) {
-            combatLog.append("Entity 1: Health: " + boss.healthString() + "\n");
-            boss.setHealth(boss.getHealth() - 5);
-            combatLog.append("Entity 1: Health: " + boss.healthString() + "\n");
+            boss.setHealth(boss.getHealth() - 100);
+            updateHP(index);
+            if(boss.isDead()) {
+                currentMonsters--;
+                combatLog.append(boss.getName() + " is dead!\n");
+                updateMenuItem(popHandler);
+            } else {
+                combatLog.append("Entity 1: Health: " + boss.healthString() + "\n");
+            }
         } else {
-            combatLog.append("Entity 1: Health: " + monsterList.get(0).healthString() + "\n");
-            monsterList.get(0).setHealth(monsterList.get(0).getHealth() - 5);
-            updateHP();
-            combatLog.append("Entity 1: Health: " + monsterList.get(0).healthString() + "\n");
+            monsterList.get(index).setHealth(monsterList.get(index).getHealth() - 20);
+            updateHP(index);
+            if(monsterList.get(index).isDead()) {
+                currentMonsters--;
+                combatLog.append(monsterList.get(index).getName() + " is dead!\n");
+                updateMenuItem(popHandler);
+            } else {
+                combatLog.append("Entity 1: Health: " + monsterList.get(index).healthString() + "\n");
+            }
         }
-
     }
+
     public void setHealText() {
         combatLog.append("Healed for 20 health!\n");
     }
@@ -489,6 +602,12 @@ public class Dungeon {
     // ==============================================
     // Utilities, Getters, and Setters
     // ==============================================
+    public boolean roomCleared() {
+        if(currentMonsters == 0) {
+            return true;
+        }
+        return false;
+    }
     public boolean isComplete() {
         if((currentRoom == dungeonSize - 1) && roomList.get(currentRoom).getCleared()) {
             return true;
@@ -512,6 +631,7 @@ public class Dungeon {
     public JPanel getDungeonPanel() { return dungeonPanel; }
     public JPanel getNextPanel() { return nextPanel; }
     public JPanel getExitPanel() { return exitPanel; }
+    public JPopupMenu getMenu() { return menu; }
     public void setWait(boolean wait) { this.wait = wait; }
     public boolean getWait() { return wait; }
     public void setCleared(boolean cleared) {
@@ -523,12 +643,16 @@ public class Dungeon {
         }
     }
     // For debugging, using console display
-    public void getCleared() {
-        System.out.println((roomList.get(currentRoom).getRoomNumber() + 1) + " " + roomList.get(currentRoom).getCleared());
+    public boolean getCleared() {
+        return this.cleared;
     }
     public void displayExit() {
         nextPanel.setVisible(false);
         exitPanel.setVisible(true);
+    }
+    public void displayNext() {
+        nextPanel.setVisible(true);
+        exitPanel.setVisible(false);
     }
     public void setVisible(boolean value) {
         dungeonPanel.setVisible(value);
@@ -540,11 +664,6 @@ public class Dungeon {
         enemyPanel.setVisible(value);
         logPanel.setVisible(value);
         exitPanel.setVisible(false);
-        if(cleared) {
-            nextPanel.setVisible(true);
-        }
-        else {
-            nextPanel.setVisible(false);
-        }
+        nextPanel.setVisible(false);
     }
 }

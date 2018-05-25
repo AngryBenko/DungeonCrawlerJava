@@ -16,11 +16,14 @@ public class GameController extends JFrame {
     private final CentralHubHandler chHandler = new CentralHubHandler();
     private final ActionButtonHandler abHandler = new ActionButtonHandler();
     private final PartyHandler pHandler = new PartyHandler();
+    private final DungeonSelectHandler dsHandler = new DungeonSelectHandler();
+    private final PopupActionListener popHandler = new PopupActionListener();
 
     private TitleScreen tS = new TitleScreen(tsHandler);
     private CentralHub cH = new CentralHub(chHandler);
     private Dungeon dungeon = new Dungeon(abHandler);
     private Party p = new Party(pHandler);
+    private DungeonSelect ds = new DungeonSelect(dsHandler);
 
     public GameController(int width, int height) {
         DISPLAY_WIDTH = width;
@@ -58,6 +61,7 @@ public class GameController extends JFrame {
 
     public void initDungeon() {
         dungeon.initDungeon();
+        dungeon.generateCharAtk(abHandler, popHandler);
         add(dungeon.getExitPanel());
         add(dungeon.getNextPanel());
         add(dungeon.getLogPanel());
@@ -70,12 +74,21 @@ public class GameController extends JFrame {
         add(dungeon.getDungeonPanel());
     }
 
+    private void initDungeonSelect() {
+        add(ds.getDSNamePanel());
+        add(ds.getDSButtonPanel());
+        add(ds.getDSEnterPanel());
+        add(ds.getDSExitPanel());
+        add(ds.getDSBackgroundPanel());
+    }
+
     private void initParty() {
-        add(p.getEnter());
-        add(p.getBackPanel());
         add(p.getPartyNamePanel());
         add(p.getPartyChosenPanel());
         add(p.getPartyIconPanel());
+        add(p.getPartyEnterPanel());
+        add(p.getPartyExitPanel());
+        add(p.getPartyBackgroundPanel());
     }
     private void displayTS(boolean value) {
         tS.setVisible(value);
@@ -94,6 +107,14 @@ public class GameController extends JFrame {
             initParty();
         p.setVisible(value);
         render();
+    }
+
+    private void displayDS(boolean value) {
+        if(value)
+            initDungeonSelect();
+        ds.setVisible(value);
+        render();
+
     }
 
     // updateDungeon() with 1 parameter is for creating the dungeon itself
@@ -117,10 +138,12 @@ public class GameController extends JFrame {
             case 1: // cleared room
                 dungeon.updateMiniMap();
                 dungeon.setWait(true);
+                dungeon.displayNext();
                 break;
             case 2: // next pressed
                 dungeon.resetCombatLog();
                 dungeon.nextRoom();
+                dungeon.generateCharAtk(abHandler, popHandler);
                 dungeon.setWait(false);
                 break;
             case 3: // dungeon complete
@@ -263,27 +286,65 @@ public class GameController extends JFrame {
                     displayCH(true);
                     break;
                 case "enter" :
-                    System.out.println("Enter Dungeon");
-                    dungeon.setParty(p.passParty());
-                    dungeon.setDungeonSize(0);
-                    String[] party = p.getParty();
-                    for(int i = 0; i < party.length; i++)
-                        System.out.println(party[i]);
-                    displayP(false);
+                    if(!p.getWait()) {
+                        System.out.println("Enter Dungeon");
+                        dungeon.setParty(p.passParty());
+                        displayP(false);
+                        displayDS(true);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            render();
+        }
+    }
+
+    public class DungeonSelectHandler implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            String yourChoice = event.getActionCommand();
+            switch(yourChoice) {
+                case "size0":
+                    System.out.println("Dungeon Size 3 Selected");
+                    dungeon.setDungeonSize(3);
+                    break;
+                case "size1" :
+                    System.out.println("Dungeon Size 5 Selected");
+                    dungeon.setDungeonSize(5);
+                    break;
+                case "size2" :
+                    System.out.println("Dungeon Size 8 Selected");
+                    dungeon.setDungeonSize(8);
+                    break;
+                case "enter" :
+                    System.out.println("Entering Dungeon");
+                    displayDS(false);
                     updateDungeon(true);
+                    break;
+                case "back"  :
+                    System.out.println("Backing to Party Select");
+                    displayDS(false);
+                    displayP(true);
                     break;
             }
         }
     }
+
 
     public class ActionButtonHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent event) {
             String yourChoice = event.getActionCommand();
             switch(yourChoice) {
-                case "Attack": // attack
+                case "Light Atk": // attack // obsolete
                     if(!dungeon.getWait()) {
-                        dungeon.setCombatText();
+                        dungeon.combat(0, popHandler);
+                    }
+                    break;
+                case "Heavy Atk": // obsolete
+                    if(!dungeon.getWait()) {
+                        dungeon.combat(0, popHandler);
                     }
                     break;
                 case "Heal": // item
@@ -291,22 +352,14 @@ public class GameController extends JFrame {
                         dungeon.setHealText();
                     }
                     break;
-                case "Run": // Run
-                    dungeon.setCleared(false);
-                    updateDungeon(false, 0);
-                    displayTS(true);
-                    break;
-                case "Punch": // punch
-                    if(dungeon.isComplete()) {
-                        System.out.println("DUNGEON COMPLETE!");
-                    } else  {
-                        System.out.println("DUNGEON IN PROGRESS!");
+                case "Swap": // Run
+                    if(!dungeon.getWait()) {
+                        dungeon.setCleared(false);
+                        updateDungeon(false, 0);
+                        displayTS(true);
                     }
                     break;
-                case "Kick": // kick
-                    dungeon.getCleared();
-                    break;
-                case "Kamehameha": // Kamehameha
+                case "Skip": // Kamehameha
                     if(!dungeon.getWait()) {
                         dungeon.setCleared(true);
                         if(dungeon.isComplete()) {
@@ -326,6 +379,36 @@ public class GameController extends JFrame {
                     displayTS(true);
                     break;
                 default: break;
+            }
+        }
+    }
+
+    public class PopupActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            String yourChoice = event.getActionCommand();
+            switch(yourChoice) {
+                case "monster0":
+                    dungeon.combat(0, popHandler);
+                    break;
+                case "monster1":
+                    dungeon.combat(1, popHandler);
+                    break;
+                case "monster2":
+                    dungeon.combat(2, popHandler);
+                    break;
+                case "monster3":
+                    dungeon.combat(3, popHandler);
+                    break;
+                case "boss":
+                    dungeon.combat(0, popHandler);
+                    break;
+                default:
+                    break;
+            }
+            if(dungeon.roomCleared()) {
+                dungeon.setCleared(true);
+                updateDungeon(true, 1);
             }
         }
     }
