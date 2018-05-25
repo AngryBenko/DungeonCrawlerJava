@@ -7,8 +7,10 @@ import javax.swing.*;
 public class Entity {
     protected String name;
     protected boolean isTurn;
+    protected boolean isAlive = true;
     protected int maxHealth;
     protected int health;
+    protected int numOfAttacks;
     protected int lightAttack;
     protected int heavyAttack;
     protected int defense;
@@ -17,15 +19,15 @@ public class Entity {
     protected JLabel deadLabel; // display skull if dead
     protected JTextArea healthText;
 
-    public Entity(String name, int health, int lAtk, int hAtk, int spd, int def, JLabel label) {
+    public Entity(String name, int health, int lAtk, int hAtk, int spd, int nAtks, JLabel label) {
         this.isTurn = false;
         this.name = name;
+        this.numOfAttacks = nAtks;
         this.health = health;
         this.maxHealth = health;
         this.lightAttack = lAtk;
         this.heavyAttack = hAtk;
         this.speed = spd;
-        this.defense = def;
         this.label = label;
     }
 
@@ -48,6 +50,8 @@ public class Entity {
     public void setHealth(int health) {
         this.health = health;
     }
+
+    public int getNAtks() { return this.numOfAttacks; }
 
     public int getLightAttack() { return this.lightAttack; }
 
@@ -80,7 +84,7 @@ public class Entity {
     }
 
     public boolean isDead() {
-        return (health == 0);
+        return (health <= 0);
     }
 
     public void setTurn(boolean value) { isTurn = value; }
