@@ -13,7 +13,6 @@ public class Party {
     private JButton pEnter, pExit;
     private final int partySize = 1;
 
-    private JLabel partyPosLabel[] = new JLabel[partySize];
     public String selectedParty[] = new String[partySize];
     private int counter = 0;
 
@@ -31,9 +30,6 @@ public class Party {
     private final Font menuFontHover = new Font("Copperplate Gothic Bold", Font.PLAIN, 24);
 
     private Entity charParty[] = new Entity[partySize];
-
-    private JPanel enter;
-    private JButton enterB;
 
     public Party(GameController.PartyHandler pHandler) {
         init(pHandler);
@@ -191,9 +187,6 @@ public class Party {
         return true;
     }
 
-    public String[] getParty() {
-        return selectedParty;
-    }
 
     // passparty to dungeon
     public Entity[] passParty() {

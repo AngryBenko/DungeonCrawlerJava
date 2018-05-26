@@ -4,10 +4,10 @@ package Entities;
 
 public class EleFire extends Entity {
     private static final String name = "ele_fire";
-    private static final int maxHealth = 15;
-    private static final int lightAttack = 8;
-    private static final int heavyAttack = 12;
-    private static final int speed = 11;
+    private static final int maxHealth = 21;
+    private static final int lightAttack = 3;
+    private static final int heavyAttack = 7;
+    private static final int speed = 3;
     private static final int numOfAttacks = 2;
 
     public EleFire() {

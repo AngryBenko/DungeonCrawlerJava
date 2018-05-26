@@ -5,10 +5,10 @@ import java.util.ArrayList;
 
 public class Barb extends Entity {
     private static final String name = "barbarian1";
-    private static final int maxHealth = 20;
+    private static final int maxHealth = 45;
     private static final int lightAttack = 8;
-    private static final int heavyAttack = 12; 
-    private static final int speed = 5;
+    private static final int heavyAttack = 16; 
+    private static final int speed = 7;
     private static final int numOfAttacks = 2;
 
     public Barb() {

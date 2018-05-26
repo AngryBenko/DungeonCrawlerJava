@@ -4,10 +4,10 @@ import javax.swing.*;
 
 public class Bat extends Entity {
     private static final String name = "Bat";
-    private static final int maxHealth = 10;
-    private static final int lightAttack = 8;
-    private static final int heavyAttack = 12;
-    private static final int speed = 20;
+    private static final int maxHealth = 12;
+    private static final int lightAttack = 2;
+    private static final int heavyAttack = 4;
+    private static final int speed = 10;
     private static final int numOfAttacks = 2;
 
     public Bat() {

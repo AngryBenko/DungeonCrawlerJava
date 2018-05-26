@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Version 1.7.0
+  Date May 25, 2018
+- Added a functional combat system in Dungeon.java
+- Cleaned up UI
+
+## Version 1.6.0
+  Date May 24, 2018
+- Added a dungeon selection menu
+- Updated all /entity/ source files
+
 ## Version 1.5.0
   Date May 23, 2018
 - Added player class Barb.java

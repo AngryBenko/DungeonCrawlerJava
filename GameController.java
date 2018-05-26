@@ -46,22 +46,19 @@ public class GameController extends JFrame {
         displayTS(true);
         updateDungeon(false);
     }
-
     private void initMenu() {
         add(tS.getTitleNamePanel());
         add(tS.getMenuButtonPanel());
         add(tS.getBackgroundPanel());
     }
-
     private void initHub() {
         add(cH.getHubNamePanel());
         add(cH.getHubButtonPanel());
         add(cH.getHubBackgroundPanel());
     }
-
     public void initDungeon() {
         dungeon.initDungeon();
-        dungeon.generateCharAtk(abHandler, popHandler);
+        dungeon.generateCharAtk(popHandler);
         add(dungeon.getExitPanel());
         add(dungeon.getNextPanel());
         add(dungeon.getLogPanel());
@@ -73,7 +70,6 @@ public class GameController extends JFrame {
         add(dungeon.getEnemyPanel());
         add(dungeon.getDungeonPanel());
     }
-
     private void initDungeonSelect() {
         add(ds.getDSNamePanel());
         add(ds.getDSButtonPanel());
@@ -81,7 +77,6 @@ public class GameController extends JFrame {
         add(ds.getDSExitPanel());
         add(ds.getDSBackgroundPanel());
     }
-
     private void initParty() {
         add(p.getPartyNamePanel());
         add(p.getPartyChosenPanel());
@@ -90,25 +85,23 @@ public class GameController extends JFrame {
         add(p.getPartyExitPanel());
         add(p.getPartyBackgroundPanel());
     }
+
     private void displayTS(boolean value) {
         tS.setVisible(value);
         render();
     }
-
     private void displayCH(boolean value) {
         if(value)
             initHub();
         cH.setVisible(value);
         render();
     }
-
     private void displayP(boolean value) {
         if(value)
             initParty();
         p.setVisible(value);
         render();
     }
-
     private void displayDS(boolean value) {
         if(value)
             initDungeonSelect();
@@ -123,8 +116,6 @@ public class GameController extends JFrame {
         if(value)
             initDungeon();
         dungeon.setVisible(value);
-        // call combat
-        // updateDungeon(true, 4);
         render();
     }
 
@@ -143,18 +134,13 @@ public class GameController extends JFrame {
             case 2: // next pressed
                 dungeon.resetCombatLog();
                 dungeon.nextRoom();
-                dungeon.generateCharAtk(abHandler, popHandler);
+                dungeon.generateCharAtk(popHandler);
                 dungeon.setWait(false);
                 break;
             case 3: // dungeon complete
                 dungeon.updateMiniMap();
                 dungeon.setWait(true);
                 dungeon.displayExit();
-            case 4:
-                // while(!isCleared()
-                //  combat();
-                //  render();
-                break;
             default: break;
         }
         render();
@@ -171,27 +157,9 @@ public class GameController extends JFrame {
             String yourChoice = event.getActionCommand();
             switch(yourChoice) {
                 case "START":
-                    /*
-                    dungeon.setDungeonSize(0);
-                    displayTS(false);
-                    updateDungeon(true);*/
-                    /* Working
-                    System.out.println("Enter Hub");
-                    displayTS(false);
-                    displayCH(true);*/
                     System.out.println("Enter Hub");
                     displayTS(false);
                     displayCH(true);
-                    break;
-                case "Dungeon 3":
-                    dungeon.setDungeonSize(3);
-                    displayTS(false);
-                    updateDungeon(true);
-                    break;
-                case "Dungeon 5":
-                    dungeon.setDungeonSize(5);
-                    displayTS(false);
-                    updateDungeon(true);
                     break;
                 case "EXIT" :
                     System.out.println("Closing game...");
@@ -206,18 +174,12 @@ public class GameController extends JFrame {
         public void actionPerformed(ActionEvent event) {
             String yourChoice = event.getActionCommand();
             switch(yourChoice) {
-                case "hub0":
+                case "PARTY":
                     System.out.println("Enter Party Select");
                     displayCH(false);
                     displayP(true);
                     break;
-                case "hub1" :
-                    System.out.println("Enter Store");
-                    displayCH(false);
-                    //displayStore(true);
-                    System.exit(0);
-                    break;
-                case "hub2" :
+                case "BACK" :
                     System.out.println("Enter Menu");
                     displayCH(false);
                     displayTS(true);
@@ -305,25 +267,31 @@ public class GameController extends JFrame {
         public void actionPerformed(ActionEvent event) {
             String yourChoice = event.getActionCommand();
             switch(yourChoice) {
-                case "size0":
+                case "Small":
                     System.out.println("Dungeon Size 3 Selected");
                     dungeon.setDungeonSize(3);
+                    ds.setWait(false);
                     break;
-                case "size1" :
+                case "Medium" :
                     System.out.println("Dungeon Size 5 Selected");
                     dungeon.setDungeonSize(5);
+                    ds.setWait(false);
                     break;
-                case "size2" :
+                case "Large" :
                     System.out.println("Dungeon Size 8 Selected");
                     dungeon.setDungeonSize(8);
+                    ds.setWait(false);
                     break;
-                case "enter" :
-                    System.out.println("Entering Dungeon");
-                    displayDS(false);
-                    updateDungeon(true);
+                case "embark" :
+                    if(!ds.getWait()) {
+                        System.out.println("Entering Dungeon");
+                        displayDS(false);
+                        updateDungeon(true);
+                    }
                     break;
                 case "back"  :
                     System.out.println("Backing to Party Select");
+                    ds.setWait(true);
                     displayDS(false);
                     displayP(true);
                     break;
@@ -331,50 +299,15 @@ public class GameController extends JFrame {
         }
     }
 
-
     public class ActionButtonHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent event) {
             String yourChoice = event.getActionCommand();
             switch(yourChoice) {
-                case "Light Atk": // attack // obsolete
-                    if(!dungeon.getWait()) {
-                        dungeon.combat(0, popHandler);
-                    }
-                    break;
-                case "Heavy Atk": // obsolete
-                    if(!dungeon.getWait()) {
-                        dungeon.combat(0, popHandler);
-                    }
-                    break;
-                case "Heal": // item
-                    if(!dungeon.getWait()) {
-                        dungeon.setHealText();
-                    }
-                    break;
-                case "Swap": // Run
-                    if(!dungeon.getWait()) {
-                        dungeon.setCleared(false);
-                        updateDungeon(false, 0);
-                        displayTS(true);
-                    }
-                    break;
-                case "Skip": // Kamehameha
-                    if(!dungeon.getWait()) {
-                        dungeon.setCleared(true);
-                        if(dungeon.isComplete()) {
-                            updateDungeon(true, 3);
-                        } else {
-                            updateDungeon(true, 1);
-                        }
-                    }
-                    break;
-                case "nextRoom": // When "next room" is pressed, generate a new room, update minimap (All done in updateDungeon())
-                    dungeon.setCleared(false);
+                case "nextRoom": // When "next room" is pressed, generate a new room, update minimap (All done in updateDungeon()
                     updateDungeon(true, 2);
                     break;
                 case "exitDungeon":
-                    dungeon.setCleared(false);
                     updateDungeon(false, 0);
                     displayTS(true);
                     break;
@@ -388,27 +321,55 @@ public class GameController extends JFrame {
         public void actionPerformed(ActionEvent event) {
             String yourChoice = event.getActionCommand();
             switch(yourChoice) {
-                case "monster0":
-                    dungeon.combat(0, popHandler);
+                // Light Atk and Heavy Atk are only active during boss room
+                case "Light Atk":
+                    if(!dungeon.getWait()) {
+                        dungeon.combat(0, "light", popHandler);
+                    }
                     break;
-                case "monster1":
-                    dungeon.combat(1, popHandler);
+                case "Heavy Atk":
+                    if(!dungeon.getWait()) {
+                        dungeon.combat(0, "heavy", popHandler);
+                    }
                     break;
-                case "monster2":
-                    dungeon.combat(2, popHandler);
+                case "Heal":
+                    if(!dungeon.getWait()) {
+                        dungeon.heal();
+                    }
                     break;
-                case "monster3":
-                    dungeon.combat(3, popHandler);
+                case "light0":
+                    dungeon.combat(0, "light", popHandler);
                     break;
-                case "boss":
-                    dungeon.combat(0, popHandler);
+                case "light1":
+                    dungeon.combat(1, "light", popHandler);
+                    break;
+                case "light2":
+                    dungeon.combat(2, "light", popHandler);
+                    break;
+                case "light3":
+                    dungeon.combat(3, "light", popHandler);
+                    break;
+                case "heavy0":
+                    dungeon.combat(0, "heavy", popHandler);
+                    break;
+                case "heavy1":
+                    dungeon.combat(1, "heavy", popHandler);
+                    break;
+                case "heavy2":
+                    dungeon.combat(2, "heavy", popHandler);
+                    break;
+                case "heavy3":
+                    dungeon.combat(3, "heavy", popHandler);
                     break;
                 default:
                     break;
             }
-            if(dungeon.roomCleared()) {
-                dungeon.setCleared(true);
-                updateDungeon(true, 1);
+            if(dungeon.isCleared()) {
+                if(dungeon.isComplete()) {
+                    updateDungeon(true, 3);
+                } else {
+                    updateDungeon(true, 1);
+                }
             }
         }
     }

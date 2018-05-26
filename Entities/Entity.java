@@ -16,7 +16,6 @@ public class Entity {
     protected int defense;
     protected int speed;
     protected JLabel label; // add border based on turn order
-    protected JLabel deadLabel; // display skull if dead
     protected JTextArea healthText;
 
     public Entity(String name, int health, int lAtk, int hAtk, int spd, int nAtks, JLabel label) {
@@ -48,7 +47,13 @@ public class Entity {
     }
 
     public void setHealth(int health) {
-        this.health = health;
+        if(health < 0) {
+            this.health = 0;
+        } else if(health > maxHealth) {
+            this.health = maxHealth;
+        } else {
+            this.health = health;
+        }
     }
 
     public int getNAtks() { return this.numOfAttacks; }

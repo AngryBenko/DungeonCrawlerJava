@@ -39,7 +39,7 @@ public class TitleScreen {
         menuButtonPanel.setBounds(300, 300, 200, 150);
         menuButtonPanel.setBackground(Color.black);
         menuButtonPanel.setOpaque(false);
-        menuButtonPanel.setLayout(new GridLayout(4, 1, 0, 20)); // GridLayout(row, col, colgap, rowgap);
+        menuButtonPanel.setLayout(new GridLayout(2, 1, 0, 20)); // GridLayout(row, col, colgap, rowgap);
 
         backgroundPanel = new JPanel(null);
         backgroundPanel.setBounds(0, 0, 800, 600);

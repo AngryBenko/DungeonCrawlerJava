@@ -4,9 +4,9 @@ import javax.swing.*;
 
 public class Orc extends Entity {
     private static final String name = "Orc";
-    private static final int maxHealth = 15;
-    private static final int lightAttack = 8;
-    private static final int heavyAttack = 12;
+    private static final int maxHealth = 8;
+    private static final int lightAttack = 3;
+    private static final int heavyAttack = 7;
     private static final int speed = 5;
     private static final int numOfAttacks = 2;
 

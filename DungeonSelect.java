@@ -7,12 +7,12 @@ import java.awt.GridLayout;
 import javax.swing.border.LineBorder;
 
 public class DungeonSelect {
+    private boolean wait = true;
     private JPanel dSelectNamePanel, dSelectButtonPanel, backgroundPanel, dSelectExitPanel, dSelectEnterPanel;
-    private JLabel dSelectNameLabel, dSelectBackground;
+    private JLabel dSelectNameLabel, dSelectShadowLabel, dSelectBackground;
     private JButton dsEnter, dsExit, selectedButton;
 
-
-    private final String dSizeNames[] = {"3", "5", "8"};
+    private final String dSizeNames[] = {"Small", "Medium", "Large"};
     private final JButton dSizeButtons[] = new JButton[dSizeNames.length];
 
     private final Font titleFont = new Font("Copperplate Gothic Bold", Font.PLAIN, 50);
@@ -24,39 +24,74 @@ public class DungeonSelect {
     }
 
     private void init(GameController.DungeonSelectHandler dsHandler) {
-        //creating background
-        backgroundPanel = new JPanel();
-        backgroundPanel.setBounds(0, 0, 800, 600);
-        backgroundPanel.setBackground(Color.black);
-        dSelectBackground = new JLabel();
-        dSelectBackground.setBounds(0, 0, 800, 600);
-        ImageIcon backgroundImg = new ImageIcon(getClass().getClassLoader().getResource("res/background/dsBackground.png"));
-        dSelectBackground.setIcon(backgroundImg);
-        backgroundPanel.add(dSelectBackground);
+        initJPanels();
+        initJLabels();
+        initJButtons(dsHandler);
+    }
 
-        //creating the name that is shown on the top of the screen
-        dSelectNamePanel = new JPanel();
+    private void initJPanels() {
+        //name panel
+        dSelectNamePanel = new JPanel(null);
         dSelectNamePanel.setBounds(0, 100, 800, 100); // setBounds(x,y,width,height);
         dSelectNamePanel.setBackground(Color.black);
         dSelectNamePanel.setOpaque(false);
-        dSelectNameLabel = new JLabel("Select the Dungeon Size");
-        dSelectNameLabel.setForeground(Color.white);
-        dSelectNameLabel.setFont(titleFont);
-        dSelectNamePanel.add(dSelectNameLabel);
 
-        //buttons to choose size plus to enter the dungeon/go back (sizes 3, 5, 8)
+        //change size panels
         dSelectButtonPanel = new JPanel();
         dSelectButtonPanel.setBounds(300, 300, 200, 150);
         dSelectButtonPanel.setBackground(Color.black);
-        dSelectButtonPanel.setLayout(new GridLayout(3, 1, 0, 0)); // GridLayout(row, col, colgap, rowgap);
+        dSelectButtonPanel.setLayout(new GridLayout(3, 1, 0, 20)); // GridLayout(row, col, colgap, rowgap);
         dSelectButtonPanel.setOpaque(false);
+
+        //enter panel
+        dSelectEnterPanel = new JPanel();
+        dSelectEnterPanel.setBounds(655,525,100,45);
+        dSelectEnterPanel.setBackground(Color.BLACK);
+        dSelectEnterPanel.setOpaque(false);
+
+        //exit panel
+        dSelectExitPanel = new JPanel();
+        dSelectExitPanel.setBounds(50,525,80,35);
+        dSelectExitPanel.setBackground(Color.BLACK);
+        dSelectExitPanel.setOpaque(false);
+
+        //background
+        backgroundPanel = new JPanel(null);
+        backgroundPanel.setBounds(0, 0, 800, 600);
+        backgroundPanel.setBackground(Color.black);
+        backgroundPanel.setOpaque(false);
+    }
+
+    private void initJLabels() {
+        //background label
+        dSelectBackground = new JLabel();
+        dSelectBackground.setBounds(0, 0, 800, 600);
+        ImageIcon backgroundImg = new ImageIcon(getClass().getClassLoader().getResource("res/background/industrialBackground.png"));
+        dSelectBackground.setIcon(backgroundImg);
+        backgroundPanel.add(dSelectBackground);
+
+        //title label
+        dSelectNameLabel = new JLabel("Select the Dungeon Size");
+        dSelectNameLabel.setForeground(Color.white);
+        dSelectNameLabel.setFont(titleFont);
+        dSelectNameLabel.setBounds(50, 0, 800, 100);
+        dSelectNamePanel.add(dSelectNameLabel);
+
+        //title shadow label
+        dSelectShadowLabel = new JLabel("Select the Dungeon Size");
+        dSelectShadowLabel.setForeground(Color.black);
+        dSelectShadowLabel.setFont(titleFont);
+        dSelectShadowLabel.setBounds(58, 5, 800, 100);
+        dSelectNamePanel.add(dSelectShadowLabel);
+    }
+
+    private void initJButtons(GameController.DungeonSelectHandler dsHandler) {
         selectedButton = new JButton();
 
-        //creating the buttons for the dungeon sizes
-        //gets added to the dSelectButtonPanel
+        //size buttons
         for (int i = 0; i < dSizeButtons.length; i++) {
             JButton btn = new JButton(dSizeNames[i]);
-            btn.setActionCommand("size" + i);
+            btn.setActionCommand(dSizeNames[i]);
             btn.addActionListener(dsHandler);
 
             btn.setBorderPainted(false);
@@ -77,7 +112,7 @@ public class DungeonSelect {
                     selectedButton.setBorderPainted(true);
                 }
             });
-            btn.setBorder(new LineBorder(Color.RED));
+            btn.setBorder(new LineBorder(Color.GREEN));
             btn.setBackground(Color.darkGray);
             btn.setForeground(Color.white);
             btn.setFont(menuFont);
@@ -87,25 +122,19 @@ public class DungeonSelect {
             dSelectButtonPanel.add(dSizeButtons[i]);
         }
 
-        //button to enter the dungeon
-        dSelectEnterPanel = new JPanel();
-        dSelectEnterPanel.setBounds(700,525,80,45);
-        dSelectEnterPanel.setBackground(Color.BLACK);
-        dSelectEnterPanel.setOpaque(false);
-        dsEnter = new JButton("<html>Enter<br/>Dungeon</html>");
-        dsEnter.setActionCommand("enter");
+        //enter button
+        dsEnter = new JButton("Embark");
+        dsEnter.setActionCommand("embark");
         dsEnter.addActionListener(dsHandler);
         dsEnter.setBorderPainted(false);
         dsEnter.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                dsEnter.setBorder(new LineBorder(Color.YELLOW));
-                dsEnter.setBorderPainted(true);
+                dsEnter.setFont(menuFontHover);
             }
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                dsEnter.setBorder(new LineBorder(Color.WHITE));
-                dsEnter.setBorderPainted(false);
+                dsEnter.setFont(menuFont);
             }
         });
         dsEnter.setBackground(Color.darkGray);
@@ -115,11 +144,7 @@ public class DungeonSelect {
         dsEnter.setOpaque(false);
         dSelectEnterPanel.add(dsEnter);
 
-        //button to exit dungeon select (goes back to party select)
-        dSelectExitPanel = new JPanel();
-        dSelectExitPanel.setBounds(50,525,80,35);
-        dSelectExitPanel.setBackground(Color.BLACK);
-        dSelectExitPanel.setOpaque(false);
+        //exit button
         dsExit = new JButton("Back");
         dsExit.setActionCommand("back");
         dsExit.addActionListener(dsHandler);
@@ -127,13 +152,11 @@ public class DungeonSelect {
         dsExit.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                dsExit.setBorder(new LineBorder(Color.YELLOW));
-                dsExit.setBorderPainted(true);
+                dsExit.setFont(menuFontHover);
             }
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                dsExit.setBorder(new LineBorder(Color.WHITE));
-                dsExit.setBorderPainted(false);
+                dsExit.setFont(menuFont);
             }
         });
         dsExit.setBackground(Color.darkGray);
@@ -143,7 +166,8 @@ public class DungeonSelect {
         dsExit.setOpaque(false);
         dSelectExitPanel.add(dsExit);
     }
-
+    public void setWait(boolean input) { wait = input; }
+    public boolean getWait() { return wait; }
     //functions to return panels
     public JPanel getDSBackgroundPanel() { return backgroundPanel; }
     public JPanel getDSNamePanel() { return dSelectNamePanel; }
