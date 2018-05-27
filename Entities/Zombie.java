@@ -3,7 +3,7 @@ package Entities;
 import javax.swing.*;
 
 public class Zombie extends Entity {
-    private static final String name = "Zombie";
+    private static final String name = "zombie";
     private static final int maxHealth = 15;
     private static final int lightAttack = 2;
     private static final int heavyAttack = 4;

@@ -33,26 +33,26 @@ public class DungeonSelect {
         //name panel
         dSelectNamePanel = new JPanel(null);
         dSelectNamePanel.setBounds(0, 100, 800, 100); // setBounds(x,y,width,height);
-        dSelectNamePanel.setBackground(Color.black);
+        dSelectNamePanel.setBackground(Color.blue);
         dSelectNamePanel.setOpaque(false);
 
         //change size panels
         dSelectButtonPanel = new JPanel();
         dSelectButtonPanel.setBounds(300, 300, 200, 150);
-        dSelectButtonPanel.setBackground(Color.black);
+        dSelectButtonPanel.setBackground(Color.green);
         dSelectButtonPanel.setLayout(new GridLayout(3, 1, 0, 20)); // GridLayout(row, col, colgap, rowgap);
         dSelectButtonPanel.setOpaque(false);
 
         //enter panel
         dSelectEnterPanel = new JPanel();
         dSelectEnterPanel.setBounds(655,525,100,45);
-        dSelectEnterPanel.setBackground(Color.BLACK);
+        dSelectEnterPanel.setBackground(Color.magenta);
         dSelectEnterPanel.setOpaque(false);
 
         //exit panel
         dSelectExitPanel = new JPanel();
         dSelectExitPanel.setBounds(50,525,80,35);
-        dSelectExitPanel.setBackground(Color.BLACK);
+        dSelectExitPanel.setBackground(Color.orange);
         dSelectExitPanel.setOpaque(false);
 
         //background
@@ -66,8 +66,8 @@ public class DungeonSelect {
         //background label
         dSelectBackground = new JLabel();
         dSelectBackground.setBounds(0, 0, 800, 600);
-        ImageIcon backgroundImg = new ImageIcon(getClass().getClassLoader().getResource("res/background/industrialBackground.png"));
-        dSelectBackground.setIcon(backgroundImg);
+        //ImageIcon backgroundImg = new ImageIcon(getClass().getClassLoader().getResource("res/background/industrialBackground.png"));
+        dSelectBackground.setIcon(new ImageIcon(getClass().getClassLoader().getResource("res/background/industrialBackground.png")));
         backgroundPanel.add(dSelectBackground);
 
         //title label

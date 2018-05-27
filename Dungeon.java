@@ -15,6 +15,8 @@ import java.awt.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Comparator;
+import java.util.Collections;
 import java.util.Random;
 import java.util.ArrayList;
 
@@ -59,6 +61,7 @@ public class Dungeon {
     private Entity partyArray[] = new Entity[partySize];
     private ArrayList<Entity> monsterList = new ArrayList<Entity>();
     private Entity boss;
+    private ArrayList<Entity> turnOrder = new ArrayList<Entity>();
 
     public Dungeon(GameController.ActionButtonHandler abHandler) {
         init(abHandler);
@@ -75,74 +78,7 @@ public class Dungeon {
     // ============================================
     // Initialization of dungeon variables, JPanels, JLabels, and JButtons
     // ============================================
-    public void setParty(Entity[] party) {
-        for(int i = 0; i < partySize; i++) {
-            //partyArray[3 - i] = party[i]; // we flip the array order
-            partyArray[i] = party[i];
-            System.out.println("index: " + i);
-        }
-    }
-    public void generateCharAtk(GameController.PopupActionListener popHandler) {
-        menuLight = updateLightAtk(popHandler);
-        menuHeavy = updateHeavyAtk(popHandler);
-
-        for(int i = 0; i < partyArray[0].getNAtks(); i++) {
-            JButton btn = new JButton(actionNames[i]);
-            btn.setActionCommand(actionNames[i]);
-            if(isFinalRoom()) {
-                btn.addActionListener(popHandler);
-            } else {
-                switch(i) {
-                    case 0:
-                        btn.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                menuLight.show(btn, btn.getWidth()/2, btn.getHeight()/2);
-                            }
-                        });
-                        break;
-                    case 1:
-                        btn.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                menuHeavy.show(btn, btn.getWidth()/2, btn.getHeight()/2);
-                            }
-                        });
-                        break;
-                }
-            }
-            btn.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    btn.setBackground(Color.orange);
-                }
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent evt) {
-                    btn.setBackground(Color.lightGray);
-                }
-            });
-            btn.setBackground(Color.lightGray);
-            btn.setForeground(Color.white);
-            btn.setFont(buttonFont);
-            btn.setFocusPainted(false);
-            btn.setOpaque(false);
-            btn.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-            actionButtons[i] = btn;
-            choiceButtonPanel.add(actionButtons[i]);
-        }
-    }
-    public void setDungeonSize(int n) {
-        if(!(n == 0)) {
-            dungeonSize = n;
-        } else {
-            dungeonSize = 3;
-        }
-    }
     public void initDungeon() { // Initializes all dungeon component
-        if(!roomList.isEmpty()) {
-            roomList.clear();
-        }
-
         for(int i = 0; i < dungeonSize; i++) {
             if(i == 0) {
                 roomList.add(new DungeonRoom(i, false, true, false));
@@ -154,8 +90,10 @@ public class Dungeon {
         }
         generateChar();
         generateEnemy();
-        generateRoom();
+        generateTurnOrder();
+        generateBackground();
         updateMiniMap();
+        //startCombat();
     }
     private void initJPanels() {
         dungeonPanel = new JPanel(null);
@@ -171,8 +109,6 @@ public class Dungeon {
         enemyPanel.setBounds(400, 50, 400, 300);
         enemyPanel.setBackground(Color.orange);
         enemyPanel.setOpaque(false);
-
-
 
         choiceButtonPanel = new JPanel(); // if initialized with null, we can use setBounds on buttons
         choiceButtonPanel.setBounds(150, 350, 250, 250);
@@ -198,12 +134,12 @@ public class Dungeon {
         logPanel.setBackground(Color.pink);
 
         nextPanel = new JPanel();
-        nextPanel.setBounds(710, 540, 80, 50);
+        nextPanel.setBounds(710, 150, 80, 50);
         nextPanel.setBackground(Color.magenta);
         nextPanel.setOpaque(false);
 
         exitPanel = new JPanel();
-        exitPanel.setBounds(670, 540, 110, 50);
+        exitPanel.setBounds(670, 150, 110, 50);
         exitPanel.setBackground(Color.cyan);
         exitPanel.setOpaque(false);
     }
@@ -216,8 +152,8 @@ public class Dungeon {
         bossRoomLabel = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("res/background/bg_room_boss.png")));
         bossRoomLabel.setBounds(0, 0, 800, 350);
 
-        choiceLabel = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("res/background/bg_choice.png")));
-        choiceLabel.setBounds(0, 0, 400, 250);
+        choiceLabel = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("res/background/bg_choice2.png")));
+        choiceLabel.setBounds(0, 0, 150, 250);
         //choicePanel.add(choiceLabel);
 
         mapBGLabel = new JLabel(new ImageIcon(getClass().getClassLoader().getResource("res/background/bg_map.png")));
@@ -228,19 +164,39 @@ public class Dungeon {
         nextButton = new JButton("<html>Next<br/>Room</html>");
         nextButton.setActionCommand("nextRoom");
         nextButton.addActionListener(abHandler);
-        nextButton.setBackground(Color.black);
+        nextButton.setBackground(Color.darkGray);
         nextButton.setForeground(Color.white);
         nextButton.setFont(buttonFont);
         nextButton.setFocusPainted(false);
+        nextButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                nextButton.setBackground(Color.orange);
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                nextButton.setBackground(Color.darkGray);
+            }
+        });
         nextPanel.add(nextButton);
 
         exitButton = new JButton("<html>Exit<br/>Dungeon</html>");
         exitButton.setActionCommand("exitDungeon");
         exitButton.addActionListener(abHandler);
-        exitButton.setBackground(Color.black);
+        exitButton.setBackground(Color.darkGray);
         exitButton.setForeground(Color.white);
         exitButton.setFont(buttonFont);
         exitButton.setFocusPainted(false);
+        exitButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                exitButton.setBackground(Color.orange);
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                exitButton.setBackground(Color.darkGray);
+            }
+        });
         exitPanel.add(exitButton);
     }
     private void initPlayerStats() {
@@ -291,6 +247,94 @@ public class Dungeon {
     // Initializing and generating rooms, characters, monsters
     // Updating dungeon progress
     // ================================================
+    public void setParty(Entity[] party) {
+        for(int i = 0; i < partySize; i++) {
+            //partyArray[3 - i] = party[i]; // we flip the array order
+            partyArray[i] = party[i];
+            System.out.println("index: " + i);
+        }
+    }
+    public void setDungeonSize(int n) {
+        if(!(n == 0)) {
+            dungeonSize = n;
+        } else {
+            dungeonSize = 3;
+        }
+    }
+    public void generateCharAtk(GameController.DungeonCombatHandler combatHandler) {
+        choiceButtonPanel.removeAll();
+        menuLight = updateLightAtk(combatHandler);
+        menuHeavy = updateHeavyAtk(combatHandler);
+
+        for(int i = 0; i < partyArray[0].getNAtks(); i++) {
+            JButton btn = new JButton(actionNames[i]);
+            btn.setActionCommand(actionNames[i]);
+            if(isFinalRoom()) {
+                btn.addActionListener(combatHandler);
+            } else {
+                switch(i) {
+                    case 0:
+                        btn.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                menuLight.show(btn, btn.getWidth()/4, btn.getHeight());
+                            }
+                        });
+                        break;
+                    case 1:
+                        btn.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                menuHeavy.show(btn, btn.getWidth()/4, btn.getHeight());
+                            }
+                        });
+                        break;
+                    case 2 :
+                        btn.addActionListener(combatHandler);
+                        break;
+                    default: break;
+                }
+            }
+            if(i == 0 || i == 1) {
+                btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseEntered(java.awt.event.MouseEvent evt) {
+                        btn.setBackground(Color.orange);
+                        if(partyArray[0].getSkip()) {
+                            btn.setBackground(Color.red);
+                        }
+                    }
+                    @Override
+                    public void mouseExited(java.awt.event.MouseEvent evt) {
+                        btn.setBackground(Color.lightGray);
+                        if(partyArray[0].getSkip()) {
+                            btn.setBackground(Color.red);
+                        }
+                    }
+                });
+            } else {
+                btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseEntered(java.awt.event.MouseEvent evt) {
+                        btn.setBackground(Color.orange);
+                    }
+                    @Override
+                    public void mouseExited(java.awt.event.MouseEvent evt) {
+                        btn.setBackground(Color.lightGray);
+                    }
+                });
+            }
+
+            btn.setBackground(Color.lightGray);
+            btn.setForeground(Color.white);
+            btn.setFont(buttonFont);
+            btn.setFocusPainted(false);
+            btn.setOpaque(false);
+            btn.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+            actionButtons[i] = btn;
+            choiceButtonPanel.add(actionButtons[i]);
+        }
+    }
     private void generateChar() {
         System.out.println("Generating character");
         for(int i = 0; i < partySize; i++) {
@@ -302,7 +346,7 @@ public class Dungeon {
             }
         }
         playerStats.append("Name: " + partyArray[0].getName() + "\n");
-        playerStats.append("Health: " + partyArray[0].healthString() + "\n");
+        playerStats.append("Max Health: " + partyArray[0].getMaxHealth() + "\n");
         playerStats.append("Light Dmg: " + partyArray[0].getLightAttack() + "\n");
         playerStats.append("Heavy Dmg: " + partyArray[0].getHeavyAttack() + "\n");
         playerStats.append("Speed: " + partyArray[0].getSpeed() + "\n");
@@ -367,6 +411,37 @@ public class Dungeon {
             }
         }
     }
+    private void generateTurnOrder() {
+        if(!turnOrder.isEmpty()) {
+            turnOrder.clear();
+        }
+        for(int i = 0; i < partySize; i++) {
+            if(partyArray[i] != null) {
+                turnOrder.add(partyArray[i]);
+            }
+        }
+
+        if(isFinalRoom()) {
+            turnOrder.add(boss);
+        } else {
+            for(int i = 0; i < roomList.get(currentRoom).getMaxEnemies(); i++) {
+                turnOrder.add(monsterList.get(i));
+            }
+        }
+
+        Collections.sort(turnOrder, new Comparator<Entity>() {
+            @Override
+            public int compare(Entity e1, Entity e2) {
+                return e2.getSpeed() - e1.getSpeed();
+            }
+        });
+
+        turnOrder.get(0).setTurn(true);
+
+        for(int i = 0; i < turnOrder.size(); i++) {
+            System.out.println(turnOrder.get(i).getName() + ": spd: " + turnOrder.get(i).getSpeed());
+        }
+    }
     private void updateMonsterHP(int index) {
         if(isFinalRoom()) {
             monsterHPList.get(index).setText(boss.healthString());
@@ -377,7 +452,7 @@ public class Dungeon {
     private void updatePlayerHP(int index) {
         playerHPList.get(index).setText(partyArray[index].healthString());
     }
-    private void generateRoom() {
+    private void generateBackground() {
         System.out.println("Generating next room");
         dungeonPanel.remove(bossRoomLabel);
         dungeonPanel.remove(roomBG[roomDisplay]);
@@ -395,13 +470,17 @@ public class Dungeon {
         if(!isComplete()) {
             roomList.get(currentRoom).setActiveRoom(false);
             resetEnemy();
-            resetPlayerAtk();
             currentRoom++;
             roomList.get(currentRoom).setActiveRoom(true);
             generateEnemy();
-            generateRoom();
+            generateTurnOrder();
+            generateBackground();
             updateMiniMap();
-            System.out.println("Current Room: " + (currentRoom + 1));
+            if(partyArray[0].getSkip()) {
+                partyArray[0].setSkip();
+            }
+            //startCombat();
+            //System.out.println("Current Room: " + (currentRoom + 1));
         }
     }
     public void updateMiniMap() {
@@ -444,17 +523,21 @@ public class Dungeon {
             miniMap.add(i, roomLabel);
 
             mapPanel.add(miniMap.get(i));
+            mapPanel.add(roomLabel);
         }
     }
-    private JPopupMenu updateLightAtk(GameController.PopupActionListener popHandler) {
+    private JPopupMenu updateLightAtk(GameController.DungeonCombatHandler combatHandler) {
         menuLight = new JPopupMenu();
+        if(partyArray[0].getSkip()) {
+            return menuLight;
+        }
         for(int j = 0; j < roomList.get(currentRoom).getMaxEnemies(); j++) {
             JMenuItem menuItem;
             if(!isFinalRoom()) {
                 if(!monsterList.get(j).isDead()) {
                     menuItem = new JMenuItem(monsterList.get(j).getName());
                     menuItem.setActionCommand("light" + j);
-                    menuItem.addActionListener(popHandler);
+                    menuItem.addActionListener(combatHandler);
                     menuItem.setFont(buttonFont);
                     menuItem.setBackground(Color.black);
                     menuItem.setForeground(Color.white);
@@ -464,15 +547,18 @@ public class Dungeon {
         }
         return menuLight;
     }
-    private JPopupMenu updateHeavyAtk(GameController.PopupActionListener popHandler) {
+    private JPopupMenu updateHeavyAtk(GameController.DungeonCombatHandler combatHandler) {
         menuHeavy = new JPopupMenu();
+        if(partyArray[0].getSkip()) {
+            return menuLight;
+        }
         for(int i = 0; i < roomList.get(currentRoom).getMaxEnemies(); i++) {
             JMenuItem menuItem;
             if(!isFinalRoom()) {
                 if(!monsterList.get(i).isDead()) {
                     menuItem = new JMenuItem(monsterList.get(i).getName());
                     menuItem.setActionCommand("heavy" + i);
-                    menuItem.addActionListener(popHandler);
+                    menuItem.addActionListener(combatHandler);
                     menuItem.setFont(buttonFont);
                     menuItem.setBackground(Color.black);
                     menuItem.setForeground(Color.white);
@@ -486,16 +572,12 @@ public class Dungeon {
     // Reset functions
     // ================================================
     public void reset() {
-        resetPlayerAtk();
         resetPlayerStats();
         resetCombatLog();
         resetEnemy();
         resetChar();
         resetRoom();
         resetMiniMap();
-    }
-    private void resetPlayerAtk() {
-        choiceButtonPanel.removeAll();
     }
     private void resetEnemy() {
         if(!monsterList.isEmpty()) {
@@ -508,22 +590,18 @@ public class Dungeon {
             enemyPanel.remove(boss.getLabel());
         }
     }
-    private void resetChar() { // This has no use when using the current version of generateChar()
+    private void resetChar() {
         for(int i = 0; i < partySize; i ++) {
             if(partyArray[i] != null) {
                 charPanel.remove(partyArray[i].getLabel());
+                partyArray[i] = null;
             }
         }
     }
     private void resetRoom() {
         currentRoom = 0;
-        for(int i = 0; i < dungeonSize; i++) {
-            roomList.get(i).setCleared(false);
-            if(i == 0) {
-                roomList.get(i).setActiveRoom(true);
-            } else {
-                roomList.get(i).setActiveRoom(false);
-            }
+        if(!roomList.isEmpty()) {
+            roomList.clear();
         }
         System.out.println("Resetting dungeon...");
         setWait(false);
@@ -555,49 +633,138 @@ public class Dungeon {
     // Combat functions (in testing)
     // ==================================================
     // To test if we can get monster object health and change it
-    public void combat(int index, String atk, GameController.PopupActionListener popHandler) {
-        if(isFinalRoom()) {
-            switch(atk) {
-                case "light":
-                    boss.setHealth(boss.getHealth() - partyArray[0].getLightAttack());
-                    break;
-                case "heavy":
-                    boss.setHealth(boss.getHealth() - partyArray[0].getHeavyAttack());
-                    break;
+    /*public void startCombat() {
+        System.out.println("STARTING COMBAT!");
+        while(!isCleared()) {
+            for(int i = 0; i < turnOrder.size(); i++) {
+                while(turnOrder.get(i).getTurn()) {
+                    if(!turnOrder.get(i).getIsPlayer()) {
+                        if(!turnOrder.get(i).isDead()) {
+                            attackPlayer(turnOrder.get(i));
+                        }
+                    } else {
+                        // wait for player action
+                    }
+                }
+                if((i + 1) == turnOrder.size()) {
+                    turnOrder.get(0).setTurn(true);
+                } else {
+                    turnOrder.get(i + 1).setTurn(true);
+                }
             }
-            updateMonsterHP(index);
+        }
+    }*/
+    public void combat(int index, String atk, GameController.DungeonCombatHandler combatHandler) {
+        if(isFinalRoom()) {
+            if(partyArray[0].getSkip()) {
+                partyArray[0].setSkip();
+            } else {
+                switch(atk) {
+                    case "light":
+                        boss.setHealth(boss.getHealth() - partyArray[0].getLightAttack());
+                        combatLog.append("> You have dealt " + partyArray[0].getLightAttack() + " damage to " + boss.getName() + "!\n");
+                        break;
+                    case "heavy":
+                        boss.setHealth(boss.getHealth() - partyArray[0].getHeavyAttack());
+                        partyArray[0].setSkip();
+                        combatLog.append("> You used Heavy Attack on " + boss.getName() + "!\n");
+                        combatLog.append("  **You have dealt " + partyArray[0].getHeavyAttack() + " damage to " + boss.getName() + "!\n");
+                        combatLog.append("  **You will skip your next attack...\n");
+                        updateLightAtk(combatHandler);
+                        updateHeavyAtk(combatHandler);
+                        break;
+                }
+                updateMonsterHP(index);
+            }
+
             if(boss.isDead()) {
                 currentMonsters--;
                 combatLog.append(boss.getName() + " is dead!\n");
+                updateLightAtk(combatHandler);
+                updateHeavyAtk(combatHandler);
             } else {
-                combatLog.append("Boss: Health: " + boss.healthString() + "\n");
+                attackPlayer(boss);
             }
         } else {
-            switch(atk) {
-                case "light":
-                    monsterList.get(index).setHealth(monsterList.get(index).getHealth() - partyArray[0].getLightAttack());
-                    break;
-                case "heavy":
-                    monsterList.get(index).setHealth(monsterList.get(index).getHealth() - partyArray[0].getHeavyAttack());
-                    break;
+            if(partyArray[0].getSkip()) {
+                partyArray[0].setSkip();
+            } else {
+                switch(atk) {
+                    case "light":
+                        monsterList.get(index).setHealth(monsterList.get(index).getHealth() - partyArray[0].getLightAttack());
+                        combatLog.append("> You have dealt " + partyArray[0].getLightAttack() + " damage to " + monsterList.get(index).getName() + "!\n");
+                        break;
+                    case "heavy":
+                        monsterList.get(index).setHealth(monsterList.get(index).getHealth() - partyArray[0].getHeavyAttack());
+                        partyArray[0].setSkip();
+                        combatLog.append("> You used Heavy Attack on " + monsterList.get(index).getName() + "!\n");
+                        combatLog.append("  **You have dealt " + partyArray[0].getHeavyAttack() + " damage to " + monsterList.get(index).getName() + "!\n");
+                        combatLog.append("  **You will skip your next attack...\n");
+                        updateLightAtk(combatHandler);
+                        updateHeavyAtk(combatHandler);
+                        break;
+                }
+                updateMonsterHP(index);
             }
-            updateMonsterHP(index);
+
             if(monsterList.get(index).isDead()) {
                 currentMonsters--;
                 combatLog.append(monsterList.get(index).getName() + " is dead!\n");
-                updateLightAtk(popHandler);
-                updateHeavyAtk(popHandler);
+                updateLightAtk(combatHandler);
+                updateHeavyAtk(combatHandler);
             } else {
-                combatLog.append("Entity " + index + ": Health: " + monsterList.get(index).healthString() + "\n");
+                attackPlayer(monsterList.get(index));
             }
         }
+        //partyArray[0].setTurn(false);
     }
-
-    public void heal() {
-        if(partyArray[0].getHealth() < partyArray[0].getMaxHealth()) {
-            partyArray[0].setHealth(partyArray[0].getHealth() + 7);
+    public void attackPlayer(Entity monster) {
+        if(monster.getSkip()) {
+            monster.setSkip();
+        } else {
+            switch(getRandomNumber(2)) {
+                case 0: // light attack
+                    partyArray[0].setHealth(partyArray[0].getHealth() - monster.getLightAttack());
+                    combatLog.append("< " + monster.getName() + " has dealt " + monster.getLightAttack() + " damage to you!\n");
+                    break;
+                case 1: // heavy attack
+                    partyArray[0].setHealth(partyArray[0].getHealth() - monster.getHeavyAttack());
+                    monster.setSkip();
+                    combatLog.append("< " + monster.getName() + " used Heavy Attack!\n");
+                    combatLog.append("  **" + monster.getName() + " has dealt " + monster.getHeavyAttack() + " damage to you!\n");
+                    combatLog.append("  **" + monster.getName() + " will skip its next attack...\n");
+                    break;
+            }
             updatePlayerHP(0);
         }
+        if(partyArray[0].isDead()) {
+            combatLog.append("YOU HAVE DIED!!\n");
+            setWait(true);
+            displayExit();
+        }
+        //monster.setTurn(false);
+    }
+    public void heal(GameController.DungeonCombatHandler combatHandler) {
+        if(partyArray[0].getSkip()) {
+            partyArray[0].setSkip();
+            updateLightAtk(combatHandler);
+            updateHeavyAtk(combatHandler);
+        }
+        if(partyArray[0].getHealth() < partyArray[0].getMaxHealth()) {
+            partyArray[0].setHealth(partyArray[0].getHealth() + 7);
+            combatLog.append("> " + partyArray[0].getName() + " has healed for 7 health.\n");
+            updatePlayerHP(0);
+        }
+        if(isFinalRoom()) {
+            attackPlayer(boss);
+        } else {
+            int i = getRandomNumber(roomList.get(currentRoom).getMaxEnemies());
+            while(monsterList.get(i).isDead()) {
+                i = getRandomNumber(roomList.get(currentRoom).getMaxEnemies());
+            }
+            attackPlayer(monsterList.get(i));
+        }
+
     }
 
     // ==============================================

@@ -1,6 +1,5 @@
 // TODO work on an inventory system, possibly interacts with a player class?
 
-import Entities.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -17,7 +16,7 @@ public class GameController extends JFrame {
     private final ActionButtonHandler abHandler = new ActionButtonHandler();
     private final PartyHandler pHandler = new PartyHandler();
     private final DungeonSelectHandler dsHandler = new DungeonSelectHandler();
-    private final PopupActionListener popHandler = new PopupActionListener();
+    private final DungeonCombatHandler combatHandler = new DungeonCombatHandler();
 
     private TitleScreen tS = new TitleScreen(tsHandler);
     private CentralHub cH = new CentralHub(chHandler);
@@ -43,22 +42,24 @@ public class GameController extends JFrame {
         setVisible(true);
 
         initMenu();
-        displayTS(true);
-        updateDungeon(false);
+        initHub();
+        initParty();
+        initDungeonSelect();
+        initDungeon();
     }
     private void initMenu() {
         add(tS.getTitleNamePanel());
         add(tS.getMenuButtonPanel());
         add(tS.getBackgroundPanel());
+        displayTS(true);
     }
     private void initHub() {
         add(cH.getHubNamePanel());
         add(cH.getHubButtonPanel());
         add(cH.getHubBackgroundPanel());
+        displayCH(false);
     }
-    public void initDungeon() {
-        dungeon.initDungeon();
-        dungeon.generateCharAtk(popHandler);
+    private void initDungeon() {
         add(dungeon.getExitPanel());
         add(dungeon.getNextPanel());
         add(dungeon.getLogPanel());
@@ -69,6 +70,8 @@ public class GameController extends JFrame {
         add(dungeon.getCharPanel());
         add(dungeon.getEnemyPanel());
         add(dungeon.getDungeonPanel());
+        updateDungeon(false, 4);
+
     }
     private void initDungeonSelect() {
         add(ds.getDSNamePanel());
@@ -76,14 +79,17 @@ public class GameController extends JFrame {
         add(ds.getDSEnterPanel());
         add(ds.getDSExitPanel());
         add(ds.getDSBackgroundPanel());
+        displayDS(false);
     }
     private void initParty() {
+        add(p.getStatPanel());
         add(p.getPartyNamePanel());
         add(p.getPartyChosenPanel());
         add(p.getPartyIconPanel());
         add(p.getPartyEnterPanel());
         add(p.getPartyExitPanel());
         add(p.getPartyBackgroundPanel());
+        displayP(false);
     }
 
     private void displayTS(boolean value) {
@@ -91,32 +97,17 @@ public class GameController extends JFrame {
         render();
     }
     private void displayCH(boolean value) {
-        if(value)
-            initHub();
         cH.setVisible(value);
         render();
     }
     private void displayP(boolean value) {
-        if(value)
-            initParty();
         p.setVisible(value);
         render();
     }
     private void displayDS(boolean value) {
-        if(value)
-            initDungeonSelect();
         ds.setVisible(value);
         render();
 
-    }
-
-    // updateDungeon() with 1 parameter is for creating the dungeon itself
-    // TODO could combine the two overloaded functions into one(priority: low)
-    private void updateDungeon(boolean value) {
-        if(value)
-            initDungeon();
-        dungeon.setVisible(value);
-        render();
     }
 
     // updateDungeon() with 2 parameters is to handle cases within the dungeon itself
@@ -134,23 +125,29 @@ public class GameController extends JFrame {
             case 2: // next pressed
                 dungeon.resetCombatLog();
                 dungeon.nextRoom();
-                dungeon.generateCharAtk(popHandler);
+                dungeon.generateCharAtk(combatHandler);
                 dungeon.setWait(false);
                 break;
             case 3: // dungeon complete
                 dungeon.updateMiniMap();
                 dungeon.setWait(true);
                 dungeon.displayExit();
+                break;
+            case 4: // first entrance into the dungeon
+                if(value) {
+                    dungeon.initDungeon();
+                    dungeon.generateCharAtk(combatHandler);
+                    dungeon.setVisible(value);
+                }
+                break;
             default: break;
         }
         render();
     }
-
     private void render() {
         revalidate();
         repaint();
     }
-    
     public class TitleScreenHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -168,7 +165,6 @@ public class GameController extends JFrame {
             }
         }
     }
-
     public class CentralHubHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -176,6 +172,7 @@ public class GameController extends JFrame {
             switch(yourChoice) {
                 case "PARTY":
                     System.out.println("Enter Party Select");
+                    p.getPartyChosenPanel().removeAll();
                     displayCH(false);
                     displayP(true);
                     break;
@@ -187,7 +184,6 @@ public class GameController extends JFrame {
             }
         }
     }
-
     public class PartyHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -209,35 +205,35 @@ public class GameController extends JFrame {
                     System.out.println("Forth Position Selected");
                     p.setPartySlot(3, pHandler);
                     break;
-                case "num0" :
+                case "barbarian1" :
                     System.out.println("1st char selected");
                     p.setParty(0,pHandler);
                     break;
-                case "num1" :
+                case "barbarian2" :
                     System.out.println("2nd char selected");
                     p.setParty(1,pHandler);
                     break;
-                case "num2" :
+                case "beard" :
                     System.out.println("3rd char selected");
                     p.setParty(2,pHandler);
                     break;
-                case "num3" :
+                case "knight_gold" :
                     System.out.println("4th char selected");
                     p.setParty(3,pHandler);
                     break;
-                case "num4":
+                case "knight1":
                     System.out.println("5th char selected");
                     p.setParty(4, pHandler);
                     break;
-                case "num5" :
+                case "mage_fire" :
                     System.out.println("6th char selected");
                     p.setParty(5,pHandler);
                     break;
-                case "num6" :
+                case "maniac1" :
                     System.out.println("7th char selected");
                     p.setParty(6,pHandler);
                     break;
-                case "num7":
+                case "oldman":
                     System.out.println("8th char selected");
                     p.setParty(7,pHandler);
                     break;
@@ -261,7 +257,6 @@ public class GameController extends JFrame {
             render();
         }
     }
-
     public class DungeonSelectHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -286,7 +281,7 @@ public class GameController extends JFrame {
                     if(!ds.getWait()) {
                         System.out.println("Entering Dungeon");
                         displayDS(false);
-                        updateDungeon(true);
+                        updateDungeon(true, 4);
                     }
                     break;
                 case "back"  :
@@ -298,7 +293,6 @@ public class GameController extends JFrame {
             }
         }
     }
-
     public class ActionButtonHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -315,8 +309,7 @@ public class GameController extends JFrame {
             }
         }
     }
-
-    public class PopupActionListener implements ActionListener {
+    public class DungeonCombatHandler implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent event) {
             String yourChoice = event.getActionCommand();
@@ -324,42 +317,42 @@ public class GameController extends JFrame {
                 // Light Atk and Heavy Atk are only active during boss room
                 case "Light Atk":
                     if(!dungeon.getWait()) {
-                        dungeon.combat(0, "light", popHandler);
+                        dungeon.combat(0, "light", combatHandler);
                     }
                     break;
                 case "Heavy Atk":
                     if(!dungeon.getWait()) {
-                        dungeon.combat(0, "heavy", popHandler);
+                        dungeon.combat(0, "heavy", combatHandler);
                     }
                     break;
                 case "Heal":
                     if(!dungeon.getWait()) {
-                        dungeon.heal();
+                        dungeon.heal(combatHandler);
                     }
                     break;
                 case "light0":
-                    dungeon.combat(0, "light", popHandler);
+                    dungeon.combat(0, "light", combatHandler);
                     break;
                 case "light1":
-                    dungeon.combat(1, "light", popHandler);
+                    dungeon.combat(1, "light", combatHandler);
                     break;
                 case "light2":
-                    dungeon.combat(2, "light", popHandler);
+                    dungeon.combat(2, "light", combatHandler);
                     break;
                 case "light3":
-                    dungeon.combat(3, "light", popHandler);
+                    dungeon.combat(3, "light", combatHandler);
                     break;
                 case "heavy0":
-                    dungeon.combat(0, "heavy", popHandler);
+                    dungeon.combat(0, "heavy", combatHandler);
                     break;
                 case "heavy1":
-                    dungeon.combat(1, "heavy", popHandler);
+                    dungeon.combat(1, "heavy", combatHandler);
                     break;
                 case "heavy2":
-                    dungeon.combat(2, "heavy", popHandler);
+                    dungeon.combat(2, "heavy", combatHandler);
                     break;
                 case "heavy3":
-                    dungeon.combat(3, "heavy", popHandler);
+                    dungeon.combat(3, "heavy", combatHandler);
                     break;
                 default:
                     break;

@@ -28,14 +28,14 @@ public class CentralHub {
 
         //title panel
         hubNamePanel = new JPanel(null);
-        hubNamePanel.setBounds(80, 100, 800, 100); // setBounds(x,y,width,height);
-        hubNamePanel.setBackground(Color.black);
+        hubNamePanel.setBounds(0, 100, 800, 100); // setBounds(x,y,width,height);
+        hubNamePanel.setBackground(Color.blue);
         hubNamePanel.setOpaque(false);
 
         //button panel
         hubButtonPanel = new JPanel();
         hubButtonPanel.setBounds(300, 300, 200, 150);
-        hubButtonPanel.setBackground(Color.black);
+        hubButtonPanel.setBackground(Color.green);
         hubButtonPanel.setOpaque(false);
         hubButtonPanel.setLayout(new GridLayout(2, 1, 0, 20)); // GridLayout(row, col, colgap, rowgap);
     }
@@ -52,14 +52,14 @@ public class CentralHub {
         hubNameLabel = new JLabel("Central Hub");
         hubNameLabel.setForeground(Color.white);
         hubNameLabel.setFont(titleFont);
-        hubNameLabel.setBounds(135, 0, 800, 100);
+        hubNameLabel.setBounds(220, 0, 800, 100);
         hubNamePanel.add(hubNameLabel);
 
         //title shadow label
         hubShadowLabel = new JLabel("Central Hub");
         hubShadowLabel.setForeground(Color.black);
         hubShadowLabel.setFont(titleFont);
-        hubShadowLabel.setBounds(143, 5, 800, 100);
+        hubShadowLabel.setBounds(228, 5, 800, 100);
         hubNamePanel.add(hubShadowLabel);
     }
 

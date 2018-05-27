@@ -37,7 +37,7 @@ public class TitleScreen {
         // also reduces the ned for additional panels per button
         menuButtonPanel = new JPanel();
         menuButtonPanel.setBounds(300, 300, 200, 150);
-        menuButtonPanel.setBackground(Color.black);
+        menuButtonPanel.setBackground(Color.green);
         menuButtonPanel.setOpaque(false);
         menuButtonPanel.setLayout(new GridLayout(2, 1, 0, 20)); // GridLayout(row, col, colgap, rowgap);
 

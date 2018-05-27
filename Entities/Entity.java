@@ -7,7 +7,8 @@ import javax.swing.*;
 public class Entity {
     protected String name;
     protected boolean isTurn;
-    protected boolean isAlive = true;
+    protected boolean skipTurn = false;
+    protected boolean isPlayer = false;
     protected int maxHealth;
     protected int health;
     protected int numOfAttacks;
@@ -37,7 +38,8 @@ public class Entity {
     public void setName(String name) {
         this.name = name;
     }
-
+    public void setIsPlayer(boolean value) { this.isPlayer = value; }
+    public boolean getIsPlayer() { return this.isPlayer; }
     public int getMaxHealth() {
         return maxHealth;
     }
@@ -93,4 +95,8 @@ public class Entity {
     }
 
     public void setTurn(boolean value) { isTurn = value; }
+
+    public boolean getTurn() { return isTurn; }
+    public void setSkip() { this.skipTurn = !this.skipTurn; }
+    public boolean getSkip() { return skipTurn; }
 }

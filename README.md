@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
+## Version 1.7.1
+  Date May 27, 2018
+- All characters now have 3 actions
+- Added a very simple enemy AI
+- Whichever enemy that player attacks, the enemy will attack back
+- In the use of a heavy attack, that user/enemy will skip the next attack
+- Changes made are located in:
+  - Dungeon.java:
+    - Added new function: attackPlayer()
+    - combat() and heal() have been updated with new combat log updates and heavy attack skips
+    - updateLightAtk(), updateHeavyAtk(), and generateCharAtk() have been updated with heavy attack skips
 
 ## Version 1.7.0
   Date May 25, 2018

@@ -13,5 +13,6 @@ public class OldMan extends Entity {
 
     public OldMan() {
         super(name, maxHealth, lightAttack, heavyAttack, speed, numOfAttacks, new JLabel(new ImageIcon(OldMan.class.getClassLoader().getResource("res/entity/characters/" + name + ".png"))));
+        super.setIsPlayer(true);
     }
 }
