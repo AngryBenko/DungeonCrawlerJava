@@ -157,18 +157,19 @@ public class Party {
             btn.addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override
                 public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    btn.setFont(menuFontHover);
+                    btn.setBorder(BorderFactory.createLineBorder(Color.green));
+                    btn.setBorderPainted(true);
                 }
                 @Override
                 public void mouseExited(java.awt.event.MouseEvent evt) {
-                    btn.setFont(menuFont);
+                    btn.setBorder(BorderFactory.createLineBorder(Color.green));
+                    btn.setBorderPainted(false);
                 }
             });
             btn.setBorderPainted(false);
             btn.setOpaque(false);
             btn.setBackground(Color.black);
             btn.setForeground(Color.white);
-            btn.setFont(menuFont);
             btn.setFocusPainted(false);
             partyIconButtons[i] = btn;
             partyIconPanel.add(partyIconButtons[i]);
@@ -187,6 +188,7 @@ public class Party {
 
     public void setVisible(boolean value) {
         statPanel.setVisible(value);
+        statText.setText(null);
         partyNamePanel.setVisible(value);
         partyChosenPanel.setVisible(value);
         partyIconPanel.setVisible(value);
@@ -263,7 +265,6 @@ public class Party {
             // selectedParty[i] is the chosen character
             if(selectedParty[i] != null) {
                 btn = new JButton();
-                //icon = new ImageIcon(getClass().getClassLoader().getResource(selectedParty[i]));
                 btn.setIcon(new ImageIcon(getClass().getClassLoader().getResource(selectedParty[i])));
             }
             else {

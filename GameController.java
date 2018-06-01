@@ -12,8 +12,8 @@ public class GameController extends JFrame {
     private final int DISPLAY_HEIGHT;
 
     private final TitleScreenHandler tsHandler = new TitleScreenHandler();
-    private final CentralHubHandler chHandler = new CentralHubHandler();
     private final ActionButtonHandler abHandler = new ActionButtonHandler();
+    private final CentralHubHandler chHandler = new CentralHubHandler();
     private final PartyHandler pHandler = new PartyHandler();
     private final DungeonSelectHandler dsHandler = new DungeonSelectHandler();
     private final DungeonCombatHandler combatHandler = new DungeonCombatHandler();
@@ -53,12 +53,6 @@ public class GameController extends JFrame {
         add(tS.getBackgroundPanel());
         displayTS(true);
     }
-    private void initHub() {
-        add(cH.getHubNamePanel());
-        add(cH.getHubButtonPanel());
-        add(cH.getHubBackgroundPanel());
-        displayCH(false);
-    }
     private void initDungeon() {
         add(dungeon.getExitPanel());
         add(dungeon.getNextPanel());
@@ -71,7 +65,12 @@ public class GameController extends JFrame {
         add(dungeon.getEnemyPanel());
         add(dungeon.getDungeonPanel());
         updateDungeon(false, 4);
-
+    }
+    private void initHub() {
+        add(cH.getHubNamePanel());
+        add(cH.getHubButtonPanel());
+        add(cH.getHubBackgroundPanel());
+        displayCH(false);
     }
     private void initDungeonSelect() {
         add(ds.getDSNamePanel());
@@ -107,7 +106,6 @@ public class GameController extends JFrame {
     private void displayDS(boolean value) {
         ds.setVisible(value);
         render();
-
     }
 
     // updateDungeon() with 2 parameters is to handle cases within the dungeon itself

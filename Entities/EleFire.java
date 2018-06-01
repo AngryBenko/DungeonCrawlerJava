@@ -1,6 +1,6 @@
 package Entities;
 
-        import javax.swing.*;
+import javax.swing.*;
 
 public class EleFire extends Entity {
     private static final String name = "ele_fire";

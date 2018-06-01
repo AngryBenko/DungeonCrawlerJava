@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Version 1.7.1
   Date May 28, 2018
+- Character selection now displays character stats
 - All characters now have 3 actions
 - Added a very simple enemy AI
 - Whichever enemy that player attacks, the enemy will attack back
@@ -23,7 +24,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## Version 1.6.0
   Date May 24, 2018
 - Added a dungeon selection menu
-- Updated all /entity/ source files
+- Added additional monsters and players to /Entities/ folder
 
 ## Version 1.5.0
   Date May 23, 2018
@@ -33,6 +34,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## Version 1.4.0
   Date May 20, 2018
 - Renamed Monster.java to Entity.java since it is the parent for both monsters and characters
+- All monster and character images are not displayed within their respective classes.
 - Added new party system, Party.java in central hub
 - Updated all code in GameController.Java, CentralHub.Java
 
@@ -66,9 +68,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## Version 1.1.0
   Date: May 04, 2018
 - Implemented randomized background for each dungeon room
-- Added character and enemy generation
+- Added character and enemy generation(just images)
 
 ## Version 1.0.0
   Date: May 01, 2018
-- Created a Dungeon.Java, GameController.Java.
+- Created a Main.java, TitleScreen.java, Dungeon.Java, GameController.Java.
 - Currently displays a functional main menu and dungeon layout
